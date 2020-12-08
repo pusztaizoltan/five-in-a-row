@@ -72,14 +72,7 @@ public class Game implements GameInterface {
         }
 
         //Vertical
-        for (int i = 1; i < board[i].length; i++) {
-            for (int j = 1; j < board.length; j++) {
-                if (board[j][i] == player) counter++;
-                else counter = 0;
-                if (counter >= howMany) return true;
-            }
-            counter = 0;
-        }
+
 
         return false;
     }
