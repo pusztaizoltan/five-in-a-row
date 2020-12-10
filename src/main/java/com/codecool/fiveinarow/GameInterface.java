@@ -5,7 +5,7 @@ package com.codecool.fiveinarow;
 
 public interface GameInterface {
     void setBoard(int[][] board);
-    int[][] getBoard();
+    String[][] getBoard();
 
     int[] getMove(int player);
     int[] getAiMove(int player);
