@@ -60,8 +60,9 @@ public class Game implements GameInterface {
 
     public boolean hasWon(int player, int howMany) {
         int counter = 0;
+        int counter2 = 0;
 
-        //Horizontal
+        //Horizontal check
         for (int i = 1; i < board.length; i++) {
             for (int j = 1; j < board[i].length; j++) {
                 if (board[i][j] == player) counter++;
@@ -71,9 +72,36 @@ public class Game implements GameInterface {
             counter = 0;
         }
 
-        //Vertical
+        //Vertical check
+        for (int i = 1; i < board[0].length; i++) {
+            for (int j = 1; j < board.length; j++) {
+                if (board[j][i] == player) counter++;
+                else counter = 0;
+                if (counter >= howMany) return true;
+            }
+            counter = 0;
+        }
 
+        //Transverse check
+        for (int i = 1; i < board.length; i++) {
+            for (int j = 1; j < board[i].length; j++) {
+                if (board[i][j] == player) {
+                    counter++;
+                    counter2++;
+                    for (int k = 1; k < board.length - i && k < board[i].length - j; k++) {
+                        if (board[i + k][j + k] == player) counter++;
+                        else counter = 0;
+                        if (counter >= howMany) return true;
 
+                        if (i - k > 0 && board[i - k][j + k] == player) counter2++;
+                        else counter2 = 0;
+                        if (counter2 >= howMany) return true;
+                    }
+                    counter = 0;
+                    counter2 = 0;
+                }
+            }
+        }
         return false;
     }
 
@@ -81,7 +109,10 @@ public class Game implements GameInterface {
         boolean isFull = true;
         for (int i = 1; i < board.length; i++) {
             for (int j = 1; j < board[i].length; j++) {
-                if (board[i][j] == 0) isFull = false;
+                if (board[i][j] == 0) {
+                    isFull = false;
+                    break;
+                }
             }
         }
         return isFull;
