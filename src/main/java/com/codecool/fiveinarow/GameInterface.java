@@ -4,9 +4,8 @@ package com.codecool.fiveinarow;
 
 
 public interface GameInterface {
+    int[][] getBoard();
     void setBoard(int[][] board);
-    String[][] getBoard();
-
     int[] getMove(int player);
     int[] getAiMove(int player);
     void mark(int player, int row, int col);
@@ -14,6 +13,6 @@ public interface GameInterface {
     boolean isFull();
     void printBoard();
     void printResult(int player);
-    void enableAi(int player);
+    void enableAi(int player) throws Exception;
     void play(int howMany);
 }
