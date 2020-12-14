@@ -107,8 +107,8 @@ public class AI {
 			for (int col = 0; col < board[0].length; col++) {
 				if (board[row][col]==0) {
 					valueBoard[row][col] = evaluateCoordinate(board,
-						new int[]{row, col},
-						steps,
+															  new int[]{row, col},
+																steps,
 						playerToMove,
 						otherPlayer);
 				}

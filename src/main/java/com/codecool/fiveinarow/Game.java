@@ -164,7 +164,7 @@ public class Game implements GameInterface {
 
             if (player1AI) { // added for AI
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(600);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -182,7 +182,7 @@ public class Game implements GameInterface {
 
             if (player2AI) { // added for AI
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(600);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
