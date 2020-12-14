@@ -4,6 +4,10 @@ import java.util.Scanner;
 
 public class Game implements GameInterface {
     private int[][] board;
+    boolean player1AI = false; // added for AI
+    boolean player2AI = false; // added for AI
+    AI ai; // added for AI
+    int howMany; // added for AI
 
     public Game(int nRows, int nCols) {
         this.board = new int[nRows + 1][nCols + 1];
@@ -45,9 +49,6 @@ public class Game implements GameInterface {
         return move;
     }
 
-    public int[] getAiMove(int player) {
-        return null;
-    }
 
     public void mark(int player, int row, int col) {
         if (board[row][col] == 0) {
@@ -144,21 +145,55 @@ public class Game implements GameInterface {
     }
 
     public void enableAi(int player) {
+        if (player == 1) player1AI = true;
+        if (player == 2) player2AI = true;
+    }
+
+    public int[] getAiMove(int player) {
+        int otherPlayer = (player == 1) ? 2:1;
+        this.ai = new AI(this.board, this.howMany);
+        ai.valueBoard = ai.evaluateBoard(getBoard(), this.howMany, player, otherPlayer);
+        return ai.getCoordinateWithMaxValue(ai.valueBoard);
     }
 
     public void play(int howMany) {
+        this.howMany = howMany; // added for AI
         int[] move;
 
         while (true) {
-            printBoard();
-            move = getMove(1);
-            mark(1, move[0], move[1]);
+
+            if (player1AI) { // added for AI
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                move = getAiMove(1);
+                mark(1, move[0], move[1]);
+                ai.printBoard(ai.valueBoard);
+            } else {
+                printBoard();
+                move = getMove(1);
+                mark(1, move[0], move[1]);
+
+            }
             if (isFull()) break;
             if (hasWon(1, howMany)) break;
 
-            printBoard();
-            move = getMove(2);
-            mark(2, move[0], move[1]);
+            if (player2AI) { // added for AI
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                move = getAiMove(2);
+                mark(2, move[0], move[1]);
+                ai.printBoard(ai.valueBoard);
+            } else {
+                printBoard();
+                move = getMove(2);
+                mark(2, move[0], move[1]);
+            }
             if (isFull()) break;
             if (hasWon(2, howMany)) break;
         }
