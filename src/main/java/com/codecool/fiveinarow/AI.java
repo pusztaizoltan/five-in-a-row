@@ -59,9 +59,9 @@ public class AI {
 	public String convertMarker(int player) {
 		switch (player){
 			case 1:
-				return "X" ;
+				return ConsoleColors.RED + "X"+ConsoleColors.RESET ;
 			case 2:
-				return "0" ;
+				return ConsoleColors.GREEN_BRIGHT +"0" +ConsoleColors.RESET;
 			default:
 				return ".";
 		}
