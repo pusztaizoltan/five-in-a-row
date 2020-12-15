@@ -128,7 +128,6 @@ public class Game implements GameInterface {
     }
 
     public boolean isFull() {
-        boolean isFull = true;
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 if (board[i][j] == 0) {
@@ -139,7 +138,7 @@ public class Game implements GameInterface {
         return true;
     }
 
-    public void printBoard() throws InterruptedException {
+    public void printBoard() {
         int colIndex = 1;
         char rowIndex = 'A';
         for (int i = 0; i < board.length; i++) {
@@ -212,9 +211,16 @@ public class Game implements GameInterface {
                     mark(1, move[0], move[1]);
 
                 }
-                if (isFull()) break;
-                if (hasWon(1, howMany)) break;
-
+                if (isFull()) {
+                    printBoard();
+                    printResult(0);
+                    break;
+                }
+                if (hasWon(1, howMany)) {
+                    printBoard();
+                    printResult(1);
+                    break;
+                }
                 if (player2AI) { // added for AI
                     try {
                         Thread.sleep(600);
@@ -230,9 +236,12 @@ public class Game implements GameInterface {
                     mark(2, move[0], move[1]);
                 }
                 if (isFull()) break;
-                if (hasWon(2, howMany)) break;
+                if (hasWon(2, howMany)) {
+                    printBoard();
+                    printResult(2);
+                    break;
+                }
             }
-            printBoard();
             System.out.println("Game Over");
         }
 
