@@ -40,7 +40,7 @@ public class Game implements GameInterface {
             else if (coordinates.length() == 3)
                 move[1] = Character.getNumericValue(coordinates.charAt(1)) * 10 + Character.getNumericValue(coordinates.charAt(2));
 
-            if (move[0] <= maxRow && move[0] >= 0 && move[1] <= maxCol && move[1] > 0) {
+            if (move[0] <= maxRow && move[0] >= 0 && move[1] <= maxCol && move[1] > 0 && isValidMark(move)) {
                 break;
             } else {
                 System.out.println("Try Again!");
@@ -51,12 +51,7 @@ public class Game implements GameInterface {
 
 
     public void mark(int player, int row, int col) {
-        if (board[row][col] == 0) {
-            if (player == 1) board[row][col] = 1;
-            if (player == 2) board[row][col] = 2;
-        } else {
-            System.out.println("Already marked!");
-        }
+        board[row][col] = player;
     }
 
     public boolean hasWon(int player, int howMany) {
@@ -151,6 +146,10 @@ public class Game implements GameInterface {
         this.ai = new AI(this.board, this.howMany);
         ai.valueBoard = ai.evaluateBoard(getBoard(), this.howMany, player, otherPlayer);
         return ai.getCoordinateWithMaxValue(ai.valueBoard);
+    }
+
+    private boolean isValidMark (int[] move){
+        return (this.board[move[0]][move[1]] == 0);
     }
 
     public void play(int howMany) {
