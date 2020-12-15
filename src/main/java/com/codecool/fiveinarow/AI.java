@@ -3,6 +3,8 @@ package com.codecool.fiveinarow;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
+
+
 public class AI {
 	String[] rowNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""); //jo
 	String[] colNames = "abcdefghijklmnopqrstuvwxyz".split(""); //jo
@@ -57,9 +59,9 @@ public class AI {
 	public String convertMarker(int player) {
 		switch (player){
 			case 1:
-				return "X";
+				return "X" ;
 			case 2:
-				return "0";
+				return "0" ;
 			default:
 				return ".";
 		}

@@ -1,5 +1,6 @@
 package com.codecool.fiveinarow;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Game implements GameInterface {
@@ -115,25 +116,37 @@ public class Game implements GameInterface {
     }
 
     public void printBoard() {
+        System.out.println();
         int colIndex = 1;
         char rowIndex = 'A';
 
         for (int i = 0; i < board.length; i++) {
+            if (i==1) {
+                System.out.print("  +");
+                System.out.print("---".repeat(board.length-1));
+                System.out.print("--+");
+                System.out.println();
+            }
             for (int j = 0; j < board[i].length; j++) {
-                if (i == 0 && j == 0) System.out.print("   ");
+                if (i == 0 && j == 0) System.out.print("     ");
                 else if (i == 0) {
                     System.out.print(colIndex + " ");
                     if (colIndex < 10) System.out.print(" ");
                     colIndex++;
                 } else if (j == 0) {
-                    System.out.print(rowIndex + "  ");
+                    System.out.print(rowIndex + " | ");
                     rowIndex++;
-                } else if (board[i][j] == 0) System.out.print(".  ");
-                else if (board[i][j] == 1) System.out.print("X  ");
-                else if (board[i][j] == 2) System.out.print("O  ");
+                } else if (board[i][j] == 0) System.out.print(" . ");
+                else if (board[i][j] == 1) System.out.print(ConsoleColors.RED + " X " + ConsoleColors.RESET);
+                else if (board[i][j] == 2) System.out.print(ConsoleColors.GREEN_BRIGHT + " O "+ ConsoleColors.RESET);
             }
+            if (i != 0)System.out.print( " |");
             System.out.println();
         }
+        System.out.print("  +");
+        System.out.print("---".repeat(board.length-1));
+        System.out.print("--+");
+        System.out.println();
     }
 
     public void enableAi(int player) {
@@ -143,9 +156,16 @@ public class Game implements GameInterface {
 
     public int[] getAiMove(int player) {
         int otherPlayer = (player == 1) ? 2:1;
-        this.ai = new AI(this.board, this.howMany);
-        ai.valueBoard = ai.evaluateBoard(getBoard(), this.howMany, player, otherPlayer);
+        this.ai = new AI(getSubBoard(this.board), this.howMany);
+        ai.valueBoard = ai.evaluateBoard(getSubBoard(this.board), this.howMany, player, otherPlayer);
         return ai.getCoordinateWithMaxValue(ai.valueBoard);
+    }
+    public int[][] getSubBoard(int[][] board) {
+        int[][] subBoard = new int[board.length-1][board[0].length-1];
+        for (int i = 1; i < board.length; i++) {
+            subBoard[i-1] = Arrays.stream(board[i]).skip(1).toArray();
+        }
+        return subBoard;
     }
 
     private boolean isValidMark (int[] move){
@@ -165,7 +185,7 @@ public class Game implements GameInterface {
                     e.printStackTrace();
                 }
                 move = getAiMove(1);
-                mark(1, move[0], move[1]);
+                mark(1, move[0]+1, move[1]+1);
                 ai.printBoard(ai.valueBoard);
             } else {
                 printBoard();
@@ -187,7 +207,7 @@ public class Game implements GameInterface {
                     e.printStackTrace();
                 }
                 move = getAiMove(2);
-                mark(2, move[0], move[1]);
+                mark(2, move[0]+1, move[1]+1);
                 ai.printBoard(ai.valueBoard);
             } else {
                 printBoard();
