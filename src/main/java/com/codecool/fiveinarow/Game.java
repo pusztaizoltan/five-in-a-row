@@ -157,10 +157,8 @@ public class Game implements GameInterface {
                 else if (board[i][j] == 1) {
                     System.out.print(ConsoleColors.RED + "X  " + ConsoleColors.RESET);
                 }
-                else if (colIndex == olderPlayer2ColIndex && rowIndex == olderPlayer2RowIndex) System.out.print(ConsoleColors.YELLOW + "X  " + ConsoleColors.RESET);
-                else if (board[i][j] == 2) System.out.print(ConsoleColors.GREEN_BRIGHT
-
-                        + "0  " + ConsoleColors.RESET);
+                else if (colIndex == olderPlayer2ColIndex && rowIndex == olderPlayer2RowIndex) System.out.print(ConsoleColors.YELLOW + "O  " + ConsoleColors.RESET);
+                else if (board[i][j] == 2) System.out.print(ConsoleColors.GREEN_BRIGHT + "O  " + ConsoleColors.RESET);
             }
             oldPlayer1ColIndex = olderPlayer1ColIndex;
             oldPlayer1RowIndex = olderPlayer1RowIndex;
