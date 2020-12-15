@@ -141,9 +141,6 @@ public class Game implements GameInterface {
         }
     }
 
-    public void printResult(int player) {
-    }
-
     public void enableAi(int player) {
         if (player == 1) player1AI = true;
         if (player == 2) player2AI = true;
@@ -178,7 +175,11 @@ public class Game implements GameInterface {
 
             }
             if (isFull()) break;
-            if (hasWon(1, howMany)) break;
+            if (hasWon(1, howMany)){
+                printResult(1); // add printresult
+                break;
+            }
+
 
             if (player2AI) { // added for AI
                 try {
@@ -195,9 +196,21 @@ public class Game implements GameInterface {
                 mark(2, move[0], move[1]);
             }
             if (isFull()) break;
-            if (hasWon(2, howMany)) break;
+            if (hasWon(2, howMany)){
+                printResult(2); // add printresult
+                break;}
         }
         printBoard();
         System.out.println("Game Over");
+    }
+
+    public void printResult(int player) {
+        if (player == 1) {
+            System.out.println("'X' won!");
+        } else if (player == 2) {
+            System.out.println("'O' won!");
+        } else {
+            System.out.println("It's a tie!");
+        }
     }
 }
