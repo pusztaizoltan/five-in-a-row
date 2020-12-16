@@ -56,6 +56,7 @@ public class AI {
 		printColNames(nCols, "\n");
 
 	}
+
 	public String convertMarker(int player) {
 		switch (player){
 			case 1:
@@ -210,7 +211,7 @@ public class AI {
 		value += (counter >= steps-1)? 1500:0; //instant victory (pl from 4 to 5)
 		value += (counter == steps-2 && endmark1 == 0 && endmark2 ==0)? 500:0; //probable victory (pl from 3 to 4 two open end)
 		value += (counter == steps-2 && (endmark1 == 0 || endmark2 ==0))? 100:0; //stalling tactic (pl from 3 to 4 one open end)
-		value += (counter == steps-3 && endmark1 == 0 && endmark2 ==0)? 100:0; //create opportunity tactic (pl from 3 to 4 one open end)
+		value += (counter == steps-3 && endmark1 == 0 && endmark2 ==0)? 100:0; //create opportunity tactic (pl from 2 to 3 two open end)
 		value += (counter >=2 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
 		value += (counter >=1 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
 		//prevent loss: mean continuous marks with number of steps on the opponent
@@ -248,7 +249,7 @@ public class AI {
 		value += (counter >= steps-1)? 700:0; //prevent instant loss (pl from 4 to 5)
 		value += (counter == steps-2 && endmark1 == 0 && endmark2 ==0)? 300:0; //prevent probable loss (pl from 3 to 4 two open end)
 		value += (counter == steps-2 && (endmark1 == 0 || endmark2 ==0))? 10:0; //prevent stalling tactic (pl from 3 to 4 one open end)
-		value += (counter == steps-3 && endmark1 == 0 && endmark2 ==0)? 10:0; //prevent opportunity (pl from 3 to 4 one open end)
+		value += (counter == steps-3 && endmark1 == 0 && endmark2 ==0)? 10:0; //prevent opportunity (pl from 2 to 3 two open end)
 		value += (counter >=2 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
 		value += (counter >=1 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
 		return value;

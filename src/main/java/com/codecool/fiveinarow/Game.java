@@ -121,7 +121,7 @@ public class Game implements GameInterface {
         for (int i = 0; i < board.length; i++) {
             if (i==1) {
                 System.out.print("  +");
-                System.out.print("---".repeat(board.length-1));
+                System.out.print(repeat("---", board.length-1));
                 System.out.print("--+");
                 System.out.println();
             }
@@ -142,9 +142,17 @@ public class Game implements GameInterface {
             System.out.println();
         }
         System.out.print("  +");
-        System.out.print("---".repeat(board.length-1));
+        System.out.print(repeat("---", board.length-1));
         System.out.print("--+");
         System.out.println();
+    }
+
+    public String repeat(String str, int repetition){
+        String result = "";
+        for (int i = 0; i < repetition; i++) {
+            result += str;
+        }
+        return result;
     }
 
     public void enableAi(int player) {
@@ -178,7 +186,7 @@ public class Game implements GameInterface {
 
             if (player1AI) { // added for AI
                 try {
-                    Thread.sleep(600);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -200,7 +208,7 @@ public class Game implements GameInterface {
 
             if (player2AI) { // added for AI
                 try {
-                    Thread.sleep(600);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
