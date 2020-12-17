@@ -18,7 +18,6 @@ public class StartScreen {
          System.out.println(ConsoleColors.RED_BRIGHT   + "         XXXXXX         OOOO        XX       XX        OOOO        XX    XX        OOOO  ");
          System.out.println();
          System.out.println();
-         System.out.println();
          System.out.println(ConsoleColors.PURPLE +      "                                    Made by BE1_4(AOIH) team");
          System.out.println(ConsoleColors.CYAN_BRIGHT + "              1  2  3  4  5                                              1  2  3  4  5");
          System.out.println(ConsoleColors.YELLOW_BRIGHT+"           +-----------------+                                        +-----------------+");
@@ -31,17 +30,15 @@ public class StartScreen {
          System.out.println();
          System.out.println(ConsoleColors.BLUE_BRIGHT + "                                Your formidable opponent is coming!" + ConsoleColors.RESET);
          System.out.print("                                                ");
-         for (int i = 5; i > 0; i--) {
-             System.out.print("\b" + i);
-             try {
-                 Thread.sleep(1000);
-             } catch (InterruptedException ex) {
-                 Thread.currentThread().interrupt();
-             }
+         for (int i = 5; i >= 0; i--) {
+             if (i > 0) {
+                 System.out.print("\b" + i);
+                 try {
+                     Thread.sleep(1000);
+                 } catch (InterruptedException ex) {
+                     Thread.currentThread().interrupt();
+                 }
+             }  else System.out.println("\b");
          }
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println();
-          }
+        }
     }
