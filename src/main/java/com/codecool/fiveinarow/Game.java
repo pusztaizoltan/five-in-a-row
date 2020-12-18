@@ -1,114 +1,53 @@
 package com.codecool.fiveinarow;
 
-
-
-
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.stream.IntStream;
 
 public class Game implements GameInterface {
-    String[] rowNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""); //jo
-    String[] colNames = "abcdefghijklmnopqrstuvwxyz".split(""); //jo
-    int nRows; //jo
-    int nCols; //jo
-    boolean player1AI = false;
-    boolean player2AI = false;
-    int howMany;
-    String markP1 = "X";
-    String markP2 = "0";
     private int[][] board;
-    int[][] valueBoard;
-
+    boolean player1AI = false; // added for AI
+    boolean player2AI = false; // added for AI
+    AI ai; // added for AI
+    int howMany; // added for AI
 
     public Game(int nRows, int nCols) {
-        this.nRows = nRows;
-        this.nCols = nCols;
-        this.board = emptyBoard(nRows, nCols);
-    }
-    public Game(int nRows, int nCols, boolean test) {
-        this.nRows = nRows;
-        this.nCols = nCols;
-        this.board = emptyBoard(nRows, nCols);
-        if (test){
-            this.board[4][5] =1;
-            this.board[4][6] =2;
-            this.board[5][6] =1;
-            this.board[5][5] =2;
-
-        }
+        this.board = new int[nRows + 1][nCols + 1];
     }
 
-
-    private int[][] emptyBoard(int nRows, int nCols) {
-        int[][] board = new int[nRows][nCols];
-        for (int row = 0; row < board.length; row++) {
-            Arrays.fill(board[row], 0);               // fill empty cells with zeros
-        }
-        return board;
-    }
-
-    @Override
-    public void setBoard(int[][] board) {
-        this.board = board;
-    }
-
-    @Override
     public int[][] getBoard() {
         return board;
     }
 
+    public void setBoard(int[][] board) {
+        this.board = board;
+    }
 
     public int[] getMove(int player) {
-        String newCoordinates = "";
-        boolean inputValidity = false;
-        boolean emptyValidity = false;
-        boolean validity = false;
-        Scanner placementScanner = new Scanner(System.in);
-        System.out.println("Add coordinates:");
-        while(!validity) {
-            newCoordinates = placementScanner.nextLine();
-            inputValidity = validateInput(newCoordinates);
-            System.out.println("testline1 " + newCoordinates); //testline
-            if (!inputValidity) {
-                System.out.println("Invalid input. Try again!");
-                continue;
-            }
-            emptyValidity = validatePlacementByEmpty(board, newCoordinates);
-            if (!emptyValidity) {
-                System.out.println("Coordinate already selected. Chose other!");
-                continue;
-            }
-            validity = inputValidity && emptyValidity;
-        }
+        Scanner scanner = new Scanner(System.in);
+        int[] move = new int[2];
+        String coordinates;
+        int maxRow = board.length - 1;
+        int maxCol = board[0].length - 1;
 
-        return stringToArrayCoordinate(newCoordinates);
-    }
+        while (true) {
+            System.out.println("Please enter coordinates:");
+            coordinates = scanner.nextLine();
 
-    private boolean validateInput (String newCoordinates) {
-        String[] validInputs = new String[nRows*nCols];
-        int index = 0;
-        for (int i = 0; i < nCols; i++) {
-            for (int j = 0; j < nRows; j++){
-                validInputs[index] = rowNames[i] + colNames[j].toUpperCase();
-                index++;
+            if (coordinates.toLowerCase().equals("quit")) System.exit(0);
+
+            move[0] = Character.getNumericValue(coordinates.charAt(0)) - 9;
+
+            if (coordinates.length() == 2) move[1] = Character.getNumericValue(coordinates.charAt(1));
+            else if (coordinates.length() == 3)
+                move[1] = Character.getNumericValue(coordinates.charAt(1)) * 10 + Character.getNumericValue(coordinates.charAt(2));
+
+            if (move[0] <= maxRow && move[0] >= 0 && move[1] <= maxCol && move[1] > 0 && isValidMark(move)) {
+                break;
+            } else {
+                System.out.println("Try Again!");
             }
         }
-        return Arrays.stream(validInputs)
-                     .anyMatch(newCoordinates.toUpperCase()::equals);
-                    //.anyMatch(x -> newCoordinates.toUpperCase().equals(x)); //alternative
-    }
-
-    private boolean validatePlacementByEmpty (int[][] board, String newCoordinates) {
-        int[] arrayCoordinate = stringToArrayCoordinate(newCoordinates);
-        return board[arrayCoordinate[0]][arrayCoordinate[1]] == 0;
-    }
-
-    private int[] stringToArrayCoordinate(String newCoordinates) {
-        String[] coordinateArray = newCoordinates.toUpperCase().split("");
-        return new int[]{String.join("",rowNames).toUpperCase().indexOf(coordinateArray[0]),
-                         String.join("",colNames).toUpperCase().indexOf(coordinateArray[1])};
+        return move;
     }
 
 
@@ -117,92 +56,103 @@ public class Game implements GameInterface {
     }
 
     public boolean hasWon(int player, int howMany) {
+        int counter = 0;
+        int counter2 = 0;
+
+        //Horizontal check
+        for (int i = 1; i < board.length; i++) {
+            for (int j = 1; j < board[i].length; j++) {
+                if (board[i][j] == player) counter++;
+                else counter = 0;
+                if (counter >= howMany) return true;
+            }
+            counter = 0;
+        }
+
+        //Vertical check
+        for (int i = 1; i < board[0].length; i++) {
+            for (int j = 1; j < board.length; j++) {
+                if (board[j][i] == player) counter++;
+                else counter = 0;
+                if (counter >= howMany) return true;
+            }
+            counter = 0;
+        }
+
+        //Transverse check
+        for (int i = 1; i < board.length; i++) {
+            for (int j = 1; j < board[i].length; j++) {
+                if (board[i][j] == player) {
+                    counter++;
+                    counter2++;
+                    for (int k = 1; k < board.length - i && k < board[i].length - j; k++) {
+                        if (board[i + k][j + k] == player) counter++;
+                        else counter = 0;
+                        if (counter >= howMany) return true;
+
+                        if (i - k > 0 && board[i - k][j + k] == player) counter2++;
+                        else counter2 = 0;
+                        if (counter2 >= howMany) return true;
+                    }
+                    counter = 0;
+                    counter2 = 0;
+                }
+            }
+        }
         return false;
     }
 
     public boolean isFull() {
-        return !Arrays.stream(getBoard())
-                      .flatMapToInt(Arrays::stream).anyMatch(i -> i ==0);
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                if (board[i][j] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public void printBoard() {
-        printColNames(nCols, "\n");
-        printSeparator(nCols, "\n");
-        for (int i = 0; i < nRows; i++) {
-            System.out.print(rowNames[i] + " |");
-            Arrays.stream(board[i]).forEach(j -> System.out.print( "  " + convertMarker(j)));
-            System.out.print("  | " + rowNames[i]);
-            System.out.print("\n");
+        System.out.println();
+        int colIndex = 1;
+        char rowIndex = 'A';
+
+        for (int i = 0; i < board.length; i++) {
+            if (i==1) {
+                System.out.print(ConsoleColors.YELLOW_BRIGHT + "  +");
+                System.out.print(repeat("---", board.length-1));
+                System.out.print("--+" + ConsoleColors.RESET);
+                System.out.println();
+            }
+            for (int j = 0; j < board[i].length; j++) {
+                if (i == 0 && j == 0) System.out.print("     ");
+                else if (i == 0) {
+                    System.out.print(ConsoleColors.CYAN_BRIGHT + colIndex + " "+ ConsoleColors.RESET);
+                    if (colIndex < 10) System.out.print(" ");
+                    colIndex++;
+                } else if (j == 0) {
+                    System.out.print(ConsoleColors.CYAN_BRIGHT + rowIndex + ConsoleColors.YELLOW_BRIGHT + " | " + ConsoleColors.RESET);
+                    rowIndex++;
+                } else if (board[i][j] == 0) System.out.print(" . ");
+                else if (board[i][j] == 1) System.out.print(ConsoleColors.RED_BRIGHT + " X " + ConsoleColors.RESET);
+                else if (board[i][j] == 2) System.out.print(ConsoleColors.GREEN_BRIGHT + " O "+ ConsoleColors.RESET);
+            }
+            if (i != 0)System.out.print(ConsoleColors.YELLOW_BRIGHT + " |");
+            System.out.println();
         }
-        printSeparator(nCols, "\n");
-        printColNames(nCols, "\n");
+        System.out.print(ConsoleColors.YELLOW_BRIGHT + "  +");
+        System.out.print(repeat("---", board.length-1));
+        System.out.print("--+" + ConsoleColors.RESET);
+        System.out.println();
     }
 
-    public void printBoard(int[][] board) { // testmethod
-        printColNames(nCols, "");
-        System.out.print("               ");
-        printColNames(nCols, "\n");
-        printSeparator(nCols, "");
-        System.out.print("            ");
-        printSeparator(nCols, "\n");
-        int[] maxCoor = getCoordinateWithMaxValue(board);
-        int maxVal = board[maxCoor[0]][maxCoor[1]];
-        for (int i = 0; i < nRows; i++) {
-            System.out.print(rowNames[i] + " |");
-            Arrays.stream(this.board[i]).forEach(j -> System.out.print( "  " + convertMarker(j)));
-            System.out.print("  | " + rowNames[i] + "          ");
-            System.out.print(rowNames[i] + " |");
-            Arrays.stream(board[i]).forEach(j -> System.out.print("  " + ((j*2/maxVal*4.5)==0?".":(j*9/maxVal))));
-            System.out.print("  | " + rowNames[i]);
-            System.out.print("\n");
+    public String repeat(String str, int repetition){
+        String result = "";
+        for (int i = 0; i < repetition; i++) {
+            result += str;
         }
-        printSeparator(nCols, "");
-        System.out.print("            ");
-        printSeparator(nCols, "\n");
-        printColNames(nCols, "");
-        System.out.print("               ");
-        printColNames(nCols, "\n");
-
-    }
-
-//    public void printBoard(int[][] board) { // testmethod
-//        printColNames(nCols);
-//        printSeparator(nCols);
-//        for (int i = 0; i < nRows; i++) {
-//            System.out.print(rowNames[i] + " |");
-//            Arrays.stream(board[i]).forEach(j -> System.out.print( " ".repeat(4-(""+j).length()) + j));
-//            System.out.print("  | " + rowNames[i]);
-//            System.out.print("\n");
-//        }
-//        printSeparator(nCols);
-//        printColNames(nCols);
-//
-//    }
-    public String convertMarker(int player) {
-        switch (player){
-            case 1:
-                return "X";
-            case 2:
-                return "0";
-            default:
-                return ".";
-        }
-    }
-
-    public void printColNames(int nCols, String endtag) {
-        System.out.print("   ");
-        IntStream.range(0, nCols).forEach(i -> System.out.print("  " + colNames[i]));
-        System.out.print(endtag);
-    }
-
-    public void printSeparator(int nCols, String endtag) {
-        System.out.print("  +");
-        IntStream.range(0, nCols).forEach(k ->System.out.print( "---"));
-        System.out.print("--+" +endtag);
-    }
-
-
-    public void printResult(int player) {
+        return result;
     }
 
     public void enableAi(int player) {
@@ -210,310 +160,89 @@ public class Game implements GameInterface {
         if (player == 2) player2AI = true;
     }
 
-//    public int[] getMove(int player) {
-//        if (player == 1 && Player1IsAI) {return getAiMove(1);}
-//        if (player == 1 && !Player1IsAI) {return getHumanMove(1);}
-//        if (player == 2 && Player2IsAI) {return getAiMove(2);}
-//        if (player == 2 && !Player2IsAI) {return getHumanMove(2);}
-//        return null;
-//    }
-
-    public void play(int howMany) {
-        this.howMany=howMany;
-        int[] movement;
-        boolean gameover = false;
-        while(!gameover){
-            if (player1AI) {
-                movement = getAiMove(1);
-            } else {
-                movement = getMove(1);
-            }
-            mark(1, movement[0], movement[1]);
-            printBoard(valueBoard);
-//            printBoard();
-            if(isFull()) break;     //
-
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            clearScreen();
-//            Scanner pause1 = new Scanner(System.in); //testline
-//            pause1.next();//testline
-
-            if (player2AI) {
-                movement = getAiMove(2);
-            } else {
-                movement = getMove(2);
-            }
-            mark(2, movement[0], movement[1]);
-            printBoard(valueBoard);
-//            printBoard();
-            if(isFull()) break;  //
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            clearScreen();
-//            Scanner pause2 = new Scanner(System.in);//testline
-//            pause2.next();//testline
-
-        }
-
-    }
-
     public int[] getAiMove(int player) {
         int otherPlayer = (player == 1) ? 2:1;
-        int[][] valueBoard = evaluateBoard(getBoard(), this.howMany, player, otherPlayer);
-        this.valueBoard = valueBoard;
-        return getCoordinateWithMaxValue(valueBoard);
+        this.ai = new AI(getSubBoard(this.board), this.howMany);
+        ai.valueBoard = ai.evaluateBoard(getSubBoard(this.board), this.howMany, player, otherPlayer);
+        return ai.getCoordinateWithMaxValue(ai.valueBoard);
+    }
+    public int[][] getSubBoard(int[][] board) {
+        int[][] subBoard = new int[board.length-1][board[0].length-1];
+        for (int i = 1; i < board.length; i++) {
+            subBoard[i-1] = Arrays.stream(board[i]).skip(1).toArray();
+        }
+        return subBoard;
     }
 
-    public int[] getCoordinateWithMaxValue(int[][] board) {
-        int value = 0;
-        int[][] coordinates = new int[][]{{0, 0}};
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[0].length; col++) {
-                if (board[row][col]==value) {
-                    coordinates = Arrays.copyOf(coordinates,coordinates.length + 1);
-                    coordinates[coordinates.length-1] = new int[]{row, col};
+    private boolean isValidMark (int[] move){
+        return (this.board[move[0]][move[1]] == 0);
+    }
+
+    public void play(int howMany) {
+        this.howMany = howMany; // added for AI
+        int[] move;
+
+        while (true) {
+
+            if (player1AI) { // added for AI
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                if (board[row][col]>value) {
-                    coordinates = new int[][]{{row, col}};
-                    value = board[row][col];
+                move = getAiMove(1);
+                mark(1, move[0]+1, move[1]+1);
+                ai.printBoard(ai.valueBoard);
+            } else {
+                printBoard();
+                move = getMove(1);
+                mark(1, move[0], move[1]);
+
+            }
+            if (isFull()) {
+                printBoard();
+                printResult(0); // add printresultbreak;
+                break;
+            }
+            if (hasWon(1, howMany)){
+                printBoard();
+                printResult(1); // add printresult
+                break;
+            }
+            if (player2AI) { // added for AI
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                move = getAiMove(2);
+                mark(2, move[0]+1, move[1]+1);
+                ai.printBoard(ai.valueBoard);
+            } else {
+                printBoard();
+                move = getMove(2);
+                mark(2, move[0], move[1]);
             }
-        }
-        //System.out.println("variability of options" + coordinates.length);  //testline
-        if (coordinates.length==1) return coordinates[0];
-        return coordinates[(int)(Math.random() * ((coordinates.length-1) + 1))];
-    }
-
-
-    public int[][] evaluateBoard(int[][] board,
-                                 int steps,
-                                 int playerToMove,
-                                 int otherPlayer) {
-        int[][] valueBoard = emptyBoard(board.length, board[0].length);
-        for (int row = 0; row < board.length; row++) {
-            for (int col = 0; col < board[0].length; col++) {
-                if (board[row][col]==0) {
-                    valueBoard[row][col] = evaluateCoordinate(board,
-                                                              new int[]{row, col},
-                                                              steps,
-                                                              playerToMove,
-                                                              otherPlayer);
-                }
-            }
-        }
-        return valueBoard;
-    }
-
-    public int[] getNext(int[] coordinate, String direction) {
-        String[] validDirections = {"uu","ur","rr","rd","dd","dl","ll","lu"}; //PL.: uu = up, rd = right-down
-        if (Arrays.asList(validDirections).contains(direction)){
-            switch (direction){
-                case "uu":return new int[]{coordinate[0] - 1, coordinate[1]    };
-                case "ur":return new int[]{coordinate[0] - 1, coordinate[1] + 1};
-                case "rr":return new int[]{coordinate[0]    , coordinate[1] + 1};
-                case "rd":return new int[]{coordinate[0] + 1, coordinate[1] + 1};
-                case "dd":return new int[]{coordinate[0] + 1, coordinate[1]    };
-                case "dl":return new int[]{coordinate[0] + 1, coordinate[1] - 1};
-                case "ll":return new int[]{coordinate[0]    , coordinate[1] - 1};
-                case "lu":return new int[]{coordinate[0] - 1, coordinate[1] - 1};
-            }
-        } else System.out.println("invalid direction selection");
-        return coordinate; // never get here
-    }
-
-    public int[] getTrace(int[][] board,
-                          int[] startCoordinates,
-                          String direction,
-                          int steps) {
-        int[] trace = new int[1];
-        int[] traceCoordinates = startCoordinates;
-        trace[0] = board[traceCoordinates[0]][traceCoordinates[1]];
-        int nextTraceValue = 0 ;
-        for (int i = 1; i < steps; i++) {
-            traceCoordinates = getNext(traceCoordinates, direction);
-            try { nextTraceValue = board[traceCoordinates[0]][traceCoordinates[1]];
-            }catch (IndexOutOfBoundsException e){ break;}
-            trace = Arrays.copyOf(trace, i + 1);
-            trace[i] = nextTraceValue;
-        }
-        return trace;
-
-    }
-
-    public int[][] getFoldedLine(int[][] board,
-                                 int[] startCoordinates,
-                                 String[] directions,
-                                 int steps) {
-        int[][] foldedLine = new int[2][];
-        foldedLine[0] = getTrace (board,
-                                  startCoordinates,
-                                  directions[0],
-                                  steps);
-        foldedLine[1] = getTrace (board,
-                                  startCoordinates,
-                                  directions[1],
-                                  steps);
-        return foldedLine;
-    }
-
-    public int evaluateFoldedLine(int[][] foldedLine,int playerToMove, int otherPlayer, int steps) {
-        int value = 0;
-        //go for victory: mean continuous marks with number of steps
-        int counter =0;
-        int endmark1 =0;
-        int endmark2 =0;
-        boolean continuous = false;
-        for (int i = 1; i<foldedLine[0].length+1; i++) {
-            try {
-                continuous = (foldedLine[0][i] == playerToMove);
-            } catch (ArrayIndexOutOfBoundsException e){
-                endmark1 = otherPlayer;
+            if (isFull()) {
+                printBoard();
+                printResult(0); // add printresultbreak;
                 break;
             }
-            if (!continuous) {
-                endmark1 = foldedLine[0][i];
-                break;
-            }
-            counter++;
+            if (hasWon(2, howMany)){
+                printBoard();
+                printResult(2); // add printresult
+                break;}
         }
-        for (int i = 1; i<foldedLine[1].length + 1; i++) {
-            try {
-                continuous = (foldedLine[1][i] == playerToMove);
-            } catch (ArrayIndexOutOfBoundsException e){
-                endmark1 = otherPlayer;
-                break;
-            }
-            if (!continuous) {
-                endmark2 = foldedLine[1][i];
-                break;
-            }
-            counter++;
-        }
-        if (counter >= steps-1) System.out.println("Win condition ++");
-        value += (counter >= steps-1)? 1500:0; //instant victory (pl from 4 to 5)
-        if (counter == steps-2 && endmark1 == 0 && endmark2 ==0) System.out.println("Win condition +");
-        value += (counter == steps-2 && endmark1 == 0 && endmark2 ==0)? 500:0; //probable victory (pl from 3 to 4 two open end)
-        value += (counter == steps-2 && (endmark1 == 0 || endmark2 ==0))? 100:0; //stalling tactic (pl from 3 to 4 one open end)
-        value += (counter == steps-3 && endmark1 == 0 && endmark2 ==0)? 100:0; //create opportunity tactic (pl from 3 to 4 one open end)
-        value += (counter >=2 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
-        value += (counter >=1 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
-        //prevent loss: mean continuous marks with number of steps on the opponent
-        counter =0;
-        endmark1 =0;
-        endmark2 =0;
-        continuous = false;
-        for (int i = 1; i<foldedLine[0].length+1; i++) {
-            try {
-                continuous = (foldedLine[0][i] == otherPlayer);
-            } catch (ArrayIndexOutOfBoundsException e){
-                endmark1 = playerToMove;
-                break;
-            }
-            if (!continuous) {
-                endmark1 = foldedLine[0][i];
-                break;
-            }
-            counter++;
-        }
-        for (int i = 1; i<foldedLine[1].length+1; i++) {
-            try {
-                continuous = (foldedLine[1][i] == otherPlayer);
-            } catch (ArrayIndexOutOfBoundsException e){
-                endmark1 = playerToMove;
-                break;
-            }
-            if (!continuous) {
-                endmark2 = foldedLine[1][i];
-                break;
-            }
-            counter++;
-        }
-        if (counter >= steps-1) System.out.println("Lose condition ++");
-        value += (counter >= steps-1)? 700:0; //instant loss (pl from 4 to 5)
-        if (counter == steps-2 && endmark1 == 0 && endmark2 ==0) System.out.println("Lose condition +");
-        value += (counter == steps-2 && endmark1 == 0 && endmark2 ==0)? 300:0; //probable loss (pl from 3 to 4 two open end)
-        value += (counter == steps-2 && (endmark1 == 0 || endmark2 ==0))? 10:0; //prevent stalling tactic (pl from 3 to 4 one open end)
-        value += (counter == steps-3 && endmark1 == 0 && endmark2 ==0)? 10:0; //prevent opportunity (pl from 3 to 4 one open end)
-        value += (counter >=2 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
-        value += (counter >=1 && endmark1 == 0 && endmark2 ==0)? 5:0; // put next to existing
-        return value;
+        System.out.println("Game Over");
     }
 
-    public int evaluateTrace(int[] trace,int playerToMove, int otherPlayer){
-
-        int value = 0;
-//        value += trace.equals(new int[]{0,1,1,1,1}) ? 200:0;
-//        System.out.println("wincondition "+ trace.equals(new int[]{0,1,1,1,1}));
-//        value += trace.equals(new int[]{0,2,2,2,2}) ? 200:0;
-//        System.out.println("wincondition " + trace.equals(new int[]{0,2,2,2,2}));
-//        value += trace.equals(new int[]{0,1,1,1,0}) ? 100:0;
-//        value += trace.equals(new int[]{0,2,2,2,0}) ? 100:0;
-        boolean continuous;
-        continuous = false;
-        for (int i: trace) {
-            if (i == otherPlayer){break;}
-            if (i == playerToMove) {
-                if(continuous) value +=4;
-                value +=2;
-                continuous = true;
-            }
-            if (i == 0) {
-                value +=1;
-                continuous = false;}
+    public void printResult(int player) {
+        if (player == 1) {
+            System.out.println(ConsoleColors.RED_BRIGHT + "'X' won!" + ConsoleColors.RESET);
+        } else if (player == 2) {
+            System.out.println(ConsoleColors.GREEN_BRIGHT + "'O' won!" + ConsoleColors.RESET);
+        } else {
+            System.out.println(ConsoleColors.YELLOW_BRIGHT + "It's a tie!" + ConsoleColors.RESET);
         }
-        continuous = false;
-        for (int i: trace) {
-            if (i == playerToMove){break;}
-            if (i == otherPlayer){
-                if(continuous) value +=4;
-                value +=2;
-                continuous = true;
-            }
-            if (i == 0) {
-                value +=1;
-                continuous = false;
-            };
-        }
-        return value;
-    }
-
-    public int evaluateCoordinate(int[][] board,
-                                  int[] startCoordinates,
-                                  int steps,
-                                  int playerToMove,
-                                  int otherPlayer) {
-        String[][] validLines = {{"uu","dd"}, {"rr","ll"},{"lu","rd"},{"dl","ur"}};
-        String[] validDirections = {"uu","ur","rr","rd","dd","dl","ll","lu"};
-        int valueOfCoordinate = 0;
-        for (String direction: validDirections) {
-            valueOfCoordinate += evaluateTrace(getTrace(board, startCoordinates, direction, steps),
-                                               playerToMove,
-                                               otherPlayer);
-        }
-        for (String[] foldedLine: validLines) {
-            valueOfCoordinate += evaluateFoldedLine(getFoldedLine(board, startCoordinates, foldedLine, steps),
-                                                    playerToMove,
-                                                    otherPlayer,
-                                                    steps);
-        }
-        return valueOfCoordinate;
-    }
-
-    public static void clearScreen(){
-        //Clears Screen work only outside intellij
-        try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            }else{
-                Runtime.getRuntime().exec("clear");
-            }
-        } catch (IOException | InterruptedException ex) {}
     }
 }
